@@ -1,2 +1,2 @@
-# UIRM
-Unsupervised Invariant Risk Minimization paper repository
+# Unsupervised Invariant Risk Minimization
+This repository contains the code for replicating the experimental results in the "Unsupervised Invariant Risk Minimization" paper.
