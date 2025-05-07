@@ -43,19 +43,20 @@ for i in range(lam_s.shape[0]):
         continue
     U[:,i] = U_s[:,i]
 
+non_zero_columns = ~np.all(U == 0, axis=0)
+U_sq = U[:, non_zero_columns]
 
-U_r = np.zeros((lam_s.shape[0],final_dim))
+Sigma_null = (U_sq.T)@(Sigma_a@U_sq)
+lam_null, V = np.linalg.eig(Sigma_null)
+
+idx = np.argsort(lam_null)[::-1]
+
+lam_null = lam_null[idx]
+V = V[:, idx]
+
+U_r = np.zeros((lam_s.shape[0], final_dim))
 for j in range(final_dim):
-    best_score = 0
-    for i in range(lam_s.shape[0]):
-        u= U[:,i]
-        score = (u.T)@(Sigma_a@u)
-        if score> best_score:
-            best_score=score
-            best_score_ind = i
-            U_r[:,j] = u
-    U[:, best_score_ind] = np.zeros((lam_s.shape[0]))
-
+    U_r[:,j] = U_sq@(V[:,j])
 
 import matplotlib.pyplot as plt
 

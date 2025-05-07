@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import torch
 from torch.utils.data import DataLoader, Dataset, ConcatDataset
 import torchvision
-
 from CMNIST_VIAE_model import train_beta_vae, Vae_Irm
 
 
@@ -23,12 +22,10 @@ w_dis_history = np.array([])
 acc_vec = np.array([])
 num_of_channels = 3
 
-#######################################################################
-"Deterministic Settings"
+"Deterministic settings"
 # random_seed = 1
 # torch.backends.cudnn.enabled = False
 # torch.manual_seed(random_seed)
-###################################################################
 
 "Data Loading"
 
@@ -58,8 +55,8 @@ temp_train_y_e2= train_y_e2[int(train_y_e1.shape[0]/2):train_y_e1.shape[0]]
 temp_train_x_e1 = train_x_e1[0:int(train_y_e1.shape[0]/2)]
 temp_train_x_e2 = train_x_e2[int(train_y_e1.shape[0]/2):train_y_e1.shape[0]]
 
-#################################################################################
-'CMNIST- Disturbance'
+#############################################################################
+'SCMNIST'
 
 zero_channel_data = torch.zeros((temp_train_x_e1.shape[0],1,28,28))
 
@@ -90,7 +87,6 @@ ax.imshow(to_plot, cmap='gray')
 ax.axes.get_xaxis().set_ticks([])
 ax.axes.get_yaxis().set_ticks([])
 plt.show()
-fig.savefig('Trainenv2_5.png')
 
 
 fig = plt.figure(figsize=(10,4))
@@ -101,7 +97,6 @@ ax.imshow(to_plot, cmap='gray')
 ax.axes.get_xaxis().set_ticks([])
 ax.axes.get_yaxis().set_ticks([])
 plt.show()
-fig.savefig('Trainenv1_5.png')
 
 fig = plt.figure(figsize=(10,4))
 for j in range(10):
@@ -125,7 +120,7 @@ for j in range(10):
         ax.set_title("Environment 2")
 
 plt.show()
-fig.savefig('examples.png')
+
 
 HIDDEN_SIZE=256
 X_DIM=28*28
@@ -181,11 +176,10 @@ for j in range(n_samples):
         ax.set_title("Invariant")
 
 plt.show()
-fig.savefig('Env1Env2Inv.png')
 
 # Let's create with the same Z_C!
 
-z_c = torch.randn(1, 10)
+z_c = torch.randn(1, 10)*0
 n_samples=5
 
 fig = plt.figure(figsize=(7,7))
@@ -228,7 +222,6 @@ for j in range(n_samples):
         ax.set_title("Environment 2")
 
 plt.show()
-fig.savefig('SameC.png')
 
 #####################################################################################################
 # Let's create average sample
@@ -269,4 +262,3 @@ ax.axes.get_xaxis().set_ticks([])
 ax.axes.get_yaxis().set_ticks([])
 ax.set_title("Avg Sample")
 plt.show()
-fig.savefig('averaged_samples.png')

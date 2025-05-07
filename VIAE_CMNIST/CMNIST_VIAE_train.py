@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 import torch
 from torch.utils.data import DataLoader, Dataset, ConcatDataset
 import torchvision
-from CMNIST_VIAE_model import train_beta_vae, Vae_Irm, VaeEncoderEnv, VaeEncoderCausal, VaeDecoder
+
+from CMNIST_VIAE_model import train_beta_vae, Vae_Irm, VaeEncoderEnv1, VaeEncoderEnv2, VaeEncoderCausal, VaeDecoder
+
 
 datapath = '/files/'
 resultsPath = 'C:/Users/Yotam/.spyder-py3/MINST_test/results/'
@@ -21,16 +23,15 @@ w_dis_history = np.array([])
 acc_vec = np.array([])
 num_of_channels = 1
 
-#########################################################
-"Deterministic Settings"
 # random_seed = 1
 # torch.backends.cudnn.enabled = False
 # torch.manual_seed(random_seed)
-##########################################################
 
 "Data Loading"
 
 transform = torchvision.transforms.ToTensor()
+
+
 train_loader_e1 = torch.utils.data.DataLoader(
     torchvision.datasets.MNIST('../datasets/', train=True, download=True,
                                transform=transform, target_transform=None), batch_size=batch_size_train, shuffle=True)
@@ -46,7 +47,6 @@ test_loader = torch.utils.data.DataLoader(
 train_x_e1= train_loader_e1.dataset.data
 train_x_e2= train_loader_e2.dataset.data
 
-
 train_y_e1= train_loader_e1.dataset.targets
 train_y_e2= train_loader_e2.dataset.targets
 
@@ -56,12 +56,15 @@ temp_train_y_e2= train_y_e2[int(train_y_e1.shape[0]/2):train_y_e1.shape[0]]
 temp_train_x_e1 = train_x_e1[0:int(train_y_e1.shape[0]/2)]
 temp_train_x_e2 = train_x_e2[int(train_y_e1.shape[0]/2):train_y_e1.shape[0]]
 
-#############################################################################
-'CMNIST Disturbance'
+######################################################################################
+'SCMNIST'
 zero_channel_data = torch.zeros((temp_train_x_e1.shape[0],1,28,28))
 
 temp_train_x_e1 = torch.cat((temp_train_x_e1.unsqueeze(1), zero_channel_data, zero_channel_data), dim=1)
 temp_train_x_e2 = torch.cat((zero_channel_data, temp_train_x_e2.unsqueeze(1), zero_channel_data), dim=1)
+#
+# temp_train_x_e1 = temp_train_x_e1.unsqueeze(1)
+# temp_train_x_e2 = temp_train_x_e2.unsqueeze(1)
 
 temp_dataset_e1 = torch.utils.data.TensorDataset(temp_train_x_e1.float()/255, temp_train_y_e1)
 temp_dataset_e1.data = temp_train_x_e1.unsqueeze(1).float()/255
@@ -74,6 +77,7 @@ temp_dataset_e2.targets = temp_train_y_e2
 train_loader_e1= DataLoader(temp_dataset_e1, batch_size=batch_size_train, shuffle=True)
 train_loader_e2= DataLoader(temp_dataset_e2, batch_size=batch_size_train, shuffle=True)
 #############################################################################
+
 
 zero_channel = torch.zeros((28,28,1))
 
@@ -95,6 +99,7 @@ axes[1].axes.get_yaxis().set_ticks([])
 axes[1].set_title("e=2")  # Add label for e=2
 plt.tight_layout()  # Adjust layout to avoid overlap
 plt.show()
+fig.savefig('Trainenv_combined.png')  # Save the combined figure
 ####################################################################################################
 "Training!"
 vae,train_recon_errors,train_kls,train_losses= train_beta_vae(1, train_loader_e1, train_loader_e2, NUM_EPOCHS=100)
@@ -115,6 +120,8 @@ ax1.legend(legend)
 ax2.legend(legend)
 
 plt.show()
+fig.savefig('Training_Metrics.png')
+
 
 # Save the model's parameters
 torch.save(vae.state_dict(), 'vae_irm.pth')

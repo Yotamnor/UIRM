@@ -11,7 +11,7 @@ import torchvision
 import sklearn
 from sklearn import linear_model
 from sklearn.metrics import accuracy_score
-from SMNIST_VIAE_model import train_beta_vae, Vae_Irm, VaeEncoderEnv, VaeEncoderCausal, VaeDecoder
+from SMNIST_VIAE_model import train_beta_vae, Vae_Irm, VaeEncoderEnv1, VaeEncoderEnv2, VaeEncoderCausal, VaeDecoder
 ##########################################################################################################
 "Neural Nets"
 

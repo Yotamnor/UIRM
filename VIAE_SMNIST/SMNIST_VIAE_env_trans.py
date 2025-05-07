@@ -22,7 +22,7 @@ log_interval = 10
 lam = 50
 w_dis_history = np.array([])
 acc_vec = np.array([])
-
+####################################################################################
 "Data Loading"
 
 transform = torchvision.transforms.ToTensor()
@@ -53,20 +53,18 @@ temp_test_x_e2 = test_x_e2[int(test_y_e1.shape[0]/2):test_y_e1.shape[0]]
 for i in range(len(temp_test_x_e1)):
     changePa = np.random.rand(1)
     if (changePa < 1):
-        temp_test_x_e1[i, 0:7, -7:-1] = 255
-        # temp_test_x_e1[i, 0:7, -7:-1] = 255
-        # temp_test_x_e1[i, :, :] = torchvision.transforms.functional.rotate(temp_test_x_e1[i, :, :].unsqueeze(0).unsqueeze(0), angle=15)
+        temp_test_x_e1[i, 0:7, 0:7] = 255 # for e_s in E_train
+        # temp_test_x_e1[i, 0:7, -7:-1] =  255 # for e_s in E_test
 
 for i in range(len(temp_test_x_e2)):
     # changePa = np.random.rand(1)
     if (changePa < 1):
-        temp_test_x_e2[i, -7:-1, 0:7] = 255
-        # temp_test_x_e2[i, -7:-1, 0:7] = 255
-        # temp_test_x_e2[i, :, :] = torchvision.transforms.functional.rotate(temp_test_x_e2[i, :, :].unsqueeze(0).unsqueeze(0), angle=345)
+        temp_test_x_e2[i, -7:-1, -7:-1] = 255 # for e_s in E_train
+        # temp_test_x_e2[i, -7:-1, 0:7] = 255 # for e_s in E_test
 
 
 #############################################################################
-"Re_Orginize"
+"Data Orginization"
 
 temp_test_x_e1 = temp_test_x_e1
 temp_test_x_e2 = temp_test_x_e2
@@ -86,6 +84,7 @@ test_x_e1= test_loader_e1.dataset.data
 test_x_e2= test_loader_e2.dataset.data
 
 ########################################################################################################
+"Parameters"
 
 HIDDEN_SIZE=256
 X_DIM=28*28
@@ -95,15 +94,11 @@ if torch.cuda.is_available():
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 vae = Vae_Irm(x_dim=X_DIM, z_dim=Z_DIM, hidden_size=HIDDEN_SIZE, device=device).to(device)
 
-"Loading Parameters"
-# # Loading the parameters
-# vae.encoder_env1.load_state_dict(torch.load('vae_encoder_env1.pth'))
-# vae.encoder_env2.load_state_dict(torch.load('vae_encoder_env2.pth'))
-# vae.encoder_causal.load_state_dict(torch.load('vae_encoder_Cas.pth'))
-# vae.decoder.load_state_dict(torch.load('vae_decoder.pth'))
-
 ###########################################################################################################
 "Examples"
+
+torch.Size([1000, 1, 28, 28])
+zero_channel = torch.zeros((28,28,1))
 
 fig, axes = plt.subplots(1, 2, figsize=(15, 5))  # Create a figure with 1 row and 2 columns
 # Plot for e=1
@@ -152,20 +147,18 @@ for i in range(len(temp_train_x_e1)):
     changePa = np.random.rand(1)
     if (changePa < 1):
         'SMNIST'
-        temp_train_x_e1[i, 0:7, -7:-1] = 255
+        temp_train_x_e1[i, 0:7, 0:7] = 255
         'RMNIST'
-        # temp_train_x_e1[i, :, :] = torchvision.transforms.functional.rotate(temp_train_x_e1[i, :, :].unsqueeze(0).unsqueeze(0), angle=45)
-
 
 for i in range(len(temp_train_x_e2)):
     # changePa = np.random.rand(1)
     if (changePa < 1):
         'SMNIST'
-        temp_train_x_e2[i, -7:-1, 0:7] = 255
+        temp_train_x_e2[i, -7:-1, -7:-1] = 255
         'RMNIST'
-        # temp_train_x_e2[i, :, :] = torchvision.transforms.functional.rotate(temp_train_x_e2[i, :, :].unsqueeze(0).unsqueeze(0), angle=315)
+
 #############################################################################
-"Data Organize"
+"Data Organization"
 
 temp_train_x_e1 = temp_train_x_e1.unsqueeze(1)
 temp_train_x_e2 = temp_train_x_e2.unsqueeze(1)
@@ -182,7 +175,7 @@ train_loader_e1= DataLoader(temp_dataset_e1, batch_size=batch_size_train, shuffl
 train_loader_e2= DataLoader(temp_dataset_e2, batch_size=batch_size_train, shuffle=True)
 
 ###########################################################################################################################
-'Fine Tune- Inactive'
+'Fine Tune!- Turned off'
 
 vae.load_state_dict(torch.load('vae_irm.pth'))
 vae.requires_grad_(True)
@@ -213,7 +206,7 @@ batch_idx_e2, (test_data_e2, test_targets_e2) = next(test_e2)
 "Plots"
 import matplotlib.pyplot as plt
 ########################################################################
-"Orgiginal"
+"Org"
 fig = plt.figure(figsize=(9, 5))
 for i in range(3):
     plt.subplot(2,3,i+1)
@@ -235,9 +228,8 @@ for i in range(3):
     plt.yticks([])
 fig
 plt.show()
-
 #####################################################################
-"Transferred"
+"Inf!"
 
 fig = plt.figure(figsize=(9, 5))
 for i in range(3):

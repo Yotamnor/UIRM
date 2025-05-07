@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import torch
 from torch.utils.data import DataLoader, Dataset, ConcatDataset
 import torchvision
-from SMNIST_VIAE_model import train_beta_vae, Vae_Irm, VaeEncoderEnv, VaeEncoderCausal, VaeDecoder
+from SMNIST_VIAE_model import train_beta_vae, Vae_Irm, VaeEncoderEnv1, VaeEncoderEnv2, VaeEncoderCausal, VaeDecoder
 
 datapath = '/files/'
 resultsPath = 'C:/Users/Yotam/.spyder-py3/MINST_test/results/'
@@ -21,6 +21,7 @@ w_dis_history = np.array([])
 acc_vec = np.array([])
 num_of_channels = 3
 
+"Deterministic Settings"
 # random_seed = 1
 # torch.backends.cudnn.enabled = False
 # torch.manual_seed(random_seed)
@@ -63,8 +64,6 @@ for i in range(len(temp_train_x_e1)):
         'SMNIST'
         temp_train_x_e1[i, 0:7, 0:7] = 255
         'RMNIST'
-        # temp_train_x_e1[i, :, :] = torchvision.transforms.functional.rotate(temp_train_x_e1[i, :, :].unsqueeze(0).unsqueeze(0), angle=45)
-
 
 for i in range(len(temp_train_x_e2)):
     # changePa = np.random.rand(1)
@@ -72,8 +71,6 @@ for i in range(len(temp_train_x_e2)):
         'SMNIST'
         temp_train_x_e2[i, -7:-1, -7:-1] = 255
         'RMNIST'
-        # temp_train_x_e2[i, :, :] = torchvision.transforms.functional.rotate(temp_train_x_e2[i, :, :].unsqueeze(0).unsqueeze(0), angle=315)
-
 
 temp_train_x_e1 = temp_train_x_e1.unsqueeze(1)
 temp_train_x_e2 = temp_train_x_e2.unsqueeze(1)
@@ -129,6 +126,7 @@ ax1.legend(legend)
 ax2.legend(legend)
 
 plt.show()
+fig.savefig('Training_Metrics.png')
 
 # Save the model's parameters
 torch.save(vae.state_dict(), 'vae_irm.pth')

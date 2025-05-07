@@ -1,5 +1,3 @@
-# imports for the exrcise - part 1
-# you can add more if you wish (but it is not really needed)
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -24,13 +22,13 @@ lam = 50
 w_dis_history = np.array([])
 acc_vec = np.array([])
 
-########################################################################
+##############################################################
 "Deterministic Settings"
+
 # random_seed = 1
 # torch.backends.cudnn.enabled = False
 # torch.manual_seed(random_seed)
-########################################################################
-
+##########################################################
 "Data Loading"
 
 transform = torchvision.transforms.ToTensor()
@@ -46,6 +44,9 @@ test_loader_e2 = torch.utils.data.DataLoader(
 test_x_e1= test_loader_e1.dataset.data
 test_x_e2= test_loader_e2.dataset.data
 
+###################################################################################################################
+"Data Organization"
+
 test_y_e1= test_loader_e1.dataset.targets
 test_y_e2= test_loader_e2.dataset.targets
 
@@ -55,22 +56,21 @@ temp_test_y_e2= test_y_e2[int(test_y_e1.shape[0]/2):test_y_e1.shape[0]]
 temp_test_x_e1 = test_x_e1[0:int(test_y_e1.shape[0]/2)]
 temp_test_x_e2 = test_x_e2[int(test_y_e1.shape[0]/2):test_y_e1.shape[0]]
 
-########################################################################################
-
-'CMNIST- Disturbance'
+#############################################################################
+'CMNIST'
 zero_channel_data = torch.zeros((5000,1,28,28))
 
-temp_test_x_e1 = torch.cat((zero_channel_data, zero_channel_data, temp_test_x_e1.unsqueeze(1)), dim=1)
-temp_test_x_e2 = torch.cat((zero_channel_data, zero_channel_data, temp_test_x_e2.unsqueeze(1)), dim=1)
+temp_test_x_e1 = torch.cat((temp_test_x_e1.unsqueeze(1), zero_channel_data, zero_channel_data), dim=1) # for e_s in E_train
+temp_test_x_e2 = torch.cat((zero_channel_data, temp_test_x_e2.unsqueeze(1), zero_channel_data), dim=1) # for e_s in E_train
+# temp_test_x_e1 = torch.cat((zero_channel_data, zero_channel_data, temp_test_x_e1.unsqueeze(1)), dim=1) # for e_s in E_test
+# temp_test_x_e2 = torch.cat((zero_channel_data, zero_channel_data, temp_test_x_e2.unsqueeze(1)), dim=1) # for e_s in E_test
 
 temp_test_x_e1 = temp_test_x_e1
 temp_test_x_e2 = temp_test_x_e2
 temp_dataset_e1 = torch.utils.data.TensorDataset(temp_test_x_e1.unsqueeze(1).float()/255, temp_test_y_e1)
-# temp_dataset_e1 = torch.utils.data.TensorDataset(temp_test_x_e1.float(), temp_test_y_e1)
 temp_dataset_e1.data = temp_test_x_e1.float()/255
 temp_dataset_e1.targets = temp_test_y_e1
 temp_dataset_e2 = torch.utils.data.TensorDataset(temp_test_x_e2.unsqueeze(1).float()/255, temp_test_y_e2)
-# temp_dataset_e2 = torch.utils.data.TensorDataset(temp_test_x_e2.float(), temp_test_y_e2)
 temp_dataset_e2.data = temp_test_x_e2.float()/255
 temp_dataset_e2.targets = temp_test_y_e2
 
@@ -142,7 +142,7 @@ temp_train_x_e1 = train_x_e1[0:int(train_y_e1.shape[0]/2)]
 temp_train_x_e2 = train_x_e2[int(train_y_e1.shape[0]/2):train_y_e1.shape[0]]
 
 ##########################################################################################################
-'CMNIST- Disturbance'
+'CMNIST'
 zero_channel_data = torch.zeros((temp_train_x_e1.shape[0],1,28,28))
 
 temp_train_x_e1 = torch.cat((zero_channel_data, zero_channel_data, temp_train_x_e1.unsqueeze(1)), dim=1)
@@ -160,7 +160,7 @@ train_loader_e1= DataLoader(temp_dataset_e1, batch_size=batch_size_train, shuffl
 train_loader_e2= DataLoader(temp_dataset_e2, batch_size=batch_size_train, shuffle=True)
 
 ###########################################################################################################################
-'Fine Tune!'
+'Fine Tune!- Turned off'
 
 vae.load_state_dict(torch.load('vae_irm.pth'))
 vae.requires_grad_(True)
@@ -176,14 +176,22 @@ test_y_e1= test_loader_e1.dataset.targets
 test_e1 = enumerate(test_loader_e1)
 batch_idx_e1, (test_data_e1, test_targets_e1) = next(test_e1)
 
+# test_data_e1.shape
+#
+# torch.Size([1000, 1, 28, 28])
+
 test_x_e2 = test_loader_e2.dataset.data
 test_y_e2= test_loader_e2.dataset.targets
 test_e2 = enumerate(test_loader_e2)
 batch_idx_e2, (test_data_e2, test_targets_e2) = next(test_e2)
-
+#
+# test_data_e2.shape
+#
+# torch.Size([1000, 1, 28, 28])
 "Plots"
+
 ########################################################################
-"Orgiginal"
+"Org"
 fig = plt.figure(figsize=(9, 5))
 for i in range(3):
     plt.subplot(2,3,i+1)
@@ -207,7 +215,6 @@ fig
 plt.show()
 
 #####################################################################
-"Transferred"
 import matplotlib.pyplot as plt
 
 fig = plt.figure(figsize=(9, 5))

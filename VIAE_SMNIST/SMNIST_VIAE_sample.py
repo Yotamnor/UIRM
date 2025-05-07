@@ -32,13 +32,13 @@ num_of_channels = 1
 
 transform = torchvision.transforms.ToTensor()
 
-
 train_loader_e1 = torch.utils.data.DataLoader(
     torchvision.datasets.MNIST('./datasets/', train=True, download=True,
                                transform=transform, target_transform=None), batch_size=batch_size_train, shuffle=True)
 train_loader_e2 = torch.utils.data.DataLoader(
     torchvision.datasets.MNIST('./datasets/', train=True, download=True,
                                transform=transform, target_transform=None), batch_size=batch_size_train, shuffle=True)
+
 
 test_loader = torch.utils.data.DataLoader(
     torchvision.datasets.MNIST('./datasets/', train=False, download=True,
@@ -49,6 +49,7 @@ train_x_e2= train_loader_e2.dataset.data
 
 train_y_e1= train_loader_e1.dataset.targets
 train_y_e2= train_loader_e2.dataset.targets
+
 
 temp_train_y_e1= train_y_e1[0:int(train_y_e1.shape[0]/2)]
 temp_train_y_e2= train_y_e2[int(train_y_e1.shape[0]/2):train_y_e1.shape[0]]
@@ -64,17 +65,15 @@ for i in range(len(temp_train_x_e1)):
     if (changePa < 1):
         temp_train_x_e1[i, 0:7, 0:7] = 255
         'RMNIST'
-        # temp_train_x_e1[i, :, :] = torchvision.transforms.functional.rotate(temp_train_x_e1[i, :, :].unsqueeze(0).unsqueeze(0), angle=45)
-
 
 for i in range(len(temp_train_x_e2)):
     # changePa = np.random.rand(1)
     if (changePa < 1):
         temp_train_x_e2[i, -7:-1, -7:-1] = 255
         'RMNIST'
-        # temp_train_x_e2[i, :, :] = torchvision.transforms.functional.rotate(temp_train_x_e2[i, :, :].unsqueeze(0).unsqueeze(0), angle=315)
-#############################################################################
-"Re-Organize"
+
+############################################################################
+"Data Organization"
 
 temp_dataset_e1 = torch.utils.data.TensorDataset(temp_train_x_e1.float()/255, temp_train_y_e1)
 temp_dataset_e1.data = temp_train_x_e1.unsqueeze(1).float()/255
@@ -87,8 +86,9 @@ from torchvision import transforms
 train_loader_e1= DataLoader(temp_dataset_e1, batch_size=batch_size_train, shuffle=True)
 train_loader_e2= DataLoader(temp_dataset_e2, batch_size=batch_size_train, shuffle=True)
 
-###################################################################################################
-"Plot Examples"
+##################################################################################################
+
+zero_channel = torch.zeros((28,28,1))
 
 fig = plt.figure(figsize=(10,4))
 ax = fig.add_subplot(1,1,1)
@@ -128,8 +128,8 @@ for j in range(10):
     ax.axes.get_yaxis().set_ticks([])
     if j==0:
         ax.set_title("Environment 2")
-plt.show()
 
+plt.show()
 
 HIDDEN_SIZE=256
 X_DIM=28*28
@@ -229,9 +229,10 @@ for j in range(n_samples):
     ax.axes.get_yaxis().set_ticks([])
     if j==0:
         ax.set_title("Environment 2")
-plt.show()
 
-#####################################################################################################
+plt.show()
+####################################################################################################
+
 # Let's create average sample
 
 z_c = torch.randn(1, 10)

@@ -3,13 +3,16 @@ import numpy as np
 # pytorch imports
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset, ConcatDataset
 import torchvision
+import sklearn
 from sklearn import linear_model
 from sklearn.metrics import accuracy_score
-from CMNIST_VIAE_model import train_beta_vae, Vae_Irm, VaeEncoderEnv, VaeEncoderCausal, VaeDecoder
+from CMNIST_VIAE_model import train_beta_vae, Vae_Irm, VaeEncoderEnv1, VaeEncoderEnv2, VaeEncoderCausal, VaeDecoder
 ##########################################################################################################
 "Neural Nets"
+
 class Label_Class(torch.nn.Module):
 
     def __init__(self, device=torch.device("cpu")):

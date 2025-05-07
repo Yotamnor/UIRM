@@ -6,6 +6,8 @@ from collections import OrderedDict
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+# reparametrization trick
 def reparameterize(mu, logvar, device=torch.device("cpu")):
     """
     This function applies the reparameterization trick:
@@ -20,8 +22,7 @@ def reparameterize(mu, logvar, device=torch.device("cpu")):
     return mu + eps * std
 
 
-# encoder - Q(z|X)
-class VaeEncoderEnv(torch.nn.Module):
+class VaeEncoderEnv1(torch.nn.Module):
     """
        This class builds the encoder for the VAE
        :param x_dim: input dimensions
@@ -31,11 +32,17 @@ class VaeEncoderEnv(torch.nn.Module):
        """
 
     def __init__(self, x_dim=28 * 28, hidden_size=256, z_dim=10, num_in_channels = 3, device=torch.device("cpu")):
-        super(VaeEncoderEnv, self).__init__()
+        super(VaeEncoderEnv1, self).__init__()
         self.x_dim = x_dim
         self.hidden_size = hidden_size
         self.z_dim = z_dim
         self.device = device
+
+        # self.features = nn.Sequential(nn.Linear(x_dim, self.hidden_size),
+        #                               nn.ReLU())
+        # self.fc1 = nn.Linear(self.hidden_size, self.z_dim, bias=True)  # fully-connected to output mu
+        # self.fc2 = nn.Linear(self.hidden_size, self.z_dim, bias=True)  # fully-connected to output logvar
+
 
         self.pre_features = nn.Sequential(OrderedDict([
             ('conv1', nn.Conv2d(num_in_channels, 10, 5)),
@@ -79,6 +86,65 @@ class VaeEncoderEnv(torch.nn.Module):
         h = self.features(x)
         z, mu, logvar = self.bottleneck(h)
         return z, mu, logvar
+
+class VaeEncoderEnv2(torch.nn.Module):
+    """
+       This class builds the encoder for the VAE
+       :param x_dim: input dimensions
+       :param hidden_size: hidden layer size
+       :param z_dim: latent dimensions
+       :param device: cpu or gpu
+       """
+
+    def __init__(self, x_dim=28 * 28, hidden_size=256, z_dim=10, num_in_channels = 3, device=torch.device("cpu")):
+        super(VaeEncoderEnv2, self).__init__()
+        self.x_dim = x_dim
+        self.hidden_size = hidden_size
+        self.z_dim = z_dim
+        self.device = device
+
+        self.pre_features = nn.Sequential(OrderedDict([
+            ('conv1', nn.Conv2d(num_in_channels, 10, 5)),
+            ('bn1', nn.BatchNorm2d(10, momentum=1, affine=True)),
+            ('relu1', nn.ReLU(inplace=True)),
+            ('pool1', nn.MaxPool2d(2,2)),
+            ('conv2', nn.Conv2d(10,20,5)),
+            ('bn2', nn.BatchNorm2d(20, momentum=1, affine=True)),
+            ('relu2', nn.ReLU(inplace=True)),
+            ('pool2', nn.MaxPool2d(2,2)),
+            ('conv3', nn.Conv2d(20,100,4)),
+            ('relu3', nn.ReLU(inplace=True))
+        ]))
+        self.fc0 = nn.Linear(100, 50, bias = True)
+        self.fc1 = nn.Linear(50, self.z_dim, bias=True)  # fully-connected to output mu
+        self.fc2 = nn.Linear(50, self.z_dim, bias=True)  # fully-connected to output logvar
+
+    def features(self, x):
+        h = self.pre_features(x)
+        h = h.view(-1, 100)
+        h = F.relu(self.fc0(h))
+        return h
+
+    def bottleneck(self, h):
+        """
+        This function takes features from the encoder and outputs mu, log-var and a latent space vector z
+        :param h: features from the encoder
+        :return: z, mu, log-variance
+        """
+        mu, logvar = self.fc1(h), self.fc2(h)
+        # use the reparametrization trick as torch.normal(mu, logvar.exp()) is not differentiable
+        z = reparameterize(mu, logvar, device=self.device)
+        return z, mu, logvar
+
+    def forward(self, x):
+        """
+        This is the function called when doing the forward pass:
+        z, mu, logvar = VaeEncoder(X)
+        """
+        h = self.features(x)
+        z, mu, logvar = self.bottleneck(h)
+        return z, mu, logvar
+
 class VaeEncoderCausal(torch.nn.Module):
     """
        This class builds the encoder for the VAE
@@ -95,7 +161,6 @@ class VaeEncoderCausal(torch.nn.Module):
         self.z_c_dim = z_c_dim
         self.z_e_dim = z_e_dim
         self.device = device
-
 
         self.features0 = nn.Sequential(OrderedDict([
             ('conv1', nn.Conv2d(num_in_channels, 10, 5)),
@@ -159,8 +224,12 @@ class VaeDecoder(torch.nn.Module):
         self.num_out_channels = num_out_channels
 
         self.decoder = nn.Sequential(nn.Linear(self.z_dim, self.hidden_size),
+                                     # nn.BatchNorm1d(self.hidden_size, momentum=1, affine=True),
+                                     # nn.ReLU(),
                                      nn.LeakyReLU(),
                                      nn.Linear(self.hidden_size, self.hidden_size*num_out_channels),
+                                     # nn.BatchNorm1d(self.hidden_size, momentum=1, affine=True),
+                                     # nn.ReLU(),
                                      nn.LeakyReLU(),
                                      nn.Linear(self.hidden_size*num_out_channels, self.x_dim*num_out_channels),
                                      nn.Sigmoid())
@@ -180,8 +249,8 @@ class Vae_Irm(torch.nn.Module):
         super(Vae_Irm, self).__init__()
         self.device = device
         self.z_dim = z_dim
-        self.encoder_env1 = VaeEncoderEnv(x_dim, hidden_size, z_dim=z_dim, device=device)
-        self.encoder_env2 = VaeEncoderEnv(x_dim, hidden_size, z_dim=z_dim, device=device)
+        self.encoder_env1 = VaeEncoderEnv1(x_dim, hidden_size, z_dim=z_dim, device=device)
+        self.encoder_env2 = VaeEncoderEnv2(x_dim, hidden_size, z_dim=z_dim, device=device)
         self.encoder_causal = VaeEncoderCausal(x_dim, z_e_dim=z_dim, hidden_size=hidden_size, z_c_dim=z_dim, device=device)
         self.decoder = VaeDecoder(x_dim, hidden_size, z_dim=2*z_dim)
 
