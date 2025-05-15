@@ -74,11 +74,11 @@ ax0.scatter(X_1_x, X_1_y, X_1_z+10, c='blue', label='X_1 Samples', alpha=0.3)
 ax0.scatter(X_2_x, X_2_y, X_2_z, c='red', label='X_2 Samples', alpha=0.3)
 
 # Labels and legend
-ax0.set_xlabel("X-axis")
-ax0.set_ylabel("Y-axis")
-ax0.set_zlabel("Z-axis")
-ax0.set_title("Original Data")
-ax0.legend()
+ax0.set_xlabel("X-axis", fontsize=20)
+ax0.set_ylabel("Y-axis", fontsize=20)
+ax0.set_zlabel("Z-axis", fontsize=20)
+ax0.set_title("Original Data", fontsize=20)
+ax0.legend(fontsize=20)
 
 # plt.show()
 
@@ -100,11 +100,11 @@ ax1.scatter(X_1_d1, indices_x1, c='blue', label=f'x1 (Std: {std_x1:.2f})', alpha
 ax1.scatter(X_2_d1, indices_x2, c='red', label=f'x2 (Std: {std_x2:.2f})', alpha=0.6)
 
 # Formatting
-ax1.set_xlabel("Values")
-ax1.set_ylabel("Environments")
-ax1.set_title("Projection Over the Principal Invariant Direction")
+ax1.set_xlabel("Values", fontsize=20)
+ax1.set_ylabel("Environments", fontsize=20)
+ax1.set_title("Projection Over the Principal Invariant Direction", fontsize=20)
 ax1.set_yticks([0, 1], ["x1", "x2"])  # Label y-axis
-ax1.legend()
+ax1.legend(fontsize=20)
 ax1.grid(True, linestyle='--', alpha=0.5)
 
 # plt.show()
@@ -124,12 +124,13 @@ ax2.scatter(X_1_x, X_1_y, X_1_z+10, c='blue', label='X_1 Samples', alpha=0.3)
 # Plot X_2 in red
 ax2.scatter(X_2_x, X_2_y, X_2_z, c='red', label='X_2 Samples', alpha=0.3)
 
+
 # Labels and legend
-ax2.set_xlabel("X-axis")
-ax2.set_ylabel("Y-axis")
-ax2.set_zlabel("Z-axis")
-ax2.set_title("Back to the Original Space")
-ax2.legend()
+ax2.set_xlabel("X-axis", fontsize=20)
+ax2.set_ylabel("Y-axis",fontsize=20)
+ax2.set_zlabel("Z-axis", fontsize=20)
+ax2.set_title("Back to the Original Space", fontsize=20)
+ax2.legend(fontsize=20)
 
 fig
 plt.show()

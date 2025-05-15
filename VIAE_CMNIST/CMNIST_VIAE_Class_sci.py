@@ -143,13 +143,13 @@ vae.eval()
 z_1, mu_1, logvar_1 = vae.encode(temp_train_dataset_e1.data.to(device),1)
 z_2, mu_2, logvar_2 = vae.encode(temp_train_dataset_e2.data.to(device),2)
 
-z_1 = mu_1
-z_2 = mu_2
+z_1_detach = mu_1.detach()
+z_2_detach = mu_2.detach()
 
-z_1_I = z_1[:,0:10].cpu()
-z_1_e = z_1[:,10:20].cpu()
-z_2_I = z_2[:,0:10].cpu()
-z_2_e = z_2[:,10:20].cpu()
+z_1_I = z_1_detach[:,0:10].cpu()
+z_1_e = z_1_detach[:,10:20].cpu()
+z_2_I = z_2_detach[:,0:10].cpu()
+z_2_e = z_2_detach[:,10:20].cpu()
 
 z_I_train = torch.cat((z_1_I, z_2_I), 0)
 z_e_train = torch.cat((z_1_e, z_2_e), 0)
@@ -167,13 +167,13 @@ env_train = torch.cat((e1_gt, e2_gt), 0)
 z_1, mu_1, logvar_1 = vae.encode(temp_test_dataset_e1.data.to(device),1)
 z_2, mu_2, logvar_2 = vae.encode(temp_test_dataset_e2.data.to(device),2)
 
-z_1 = mu_1
-z_2 = mu_2
+z_1_detach = mu_1.detach()
+z_2_detach = mu_2.detach()
 
-z_1_I = z_1[:,0:10].cpu()
-z_1_e = z_1[:,10:20].cpu()
-z_2_I = z_2[:,0:10].cpu()
-z_2_e = z_2[:,10:20].cpu()
+z_1_I = z_1_detach[:,0:10].cpu()
+z_1_e = z_1_detach[:,10:20].cpu()
+z_2_I = z_2_detach[:,0:10].cpu()
+z_2_e = z_2_detach[:,10:20].cpu()
 
 z_I_test = torch.cat((z_1_I, z_2_I), 0)
 z_e_test = torch.cat((z_1_e, z_2_e), 0)
@@ -230,3 +230,4 @@ print("I2L Test Accuracy:", accuracy_score(labels_test, W_I2L_pred))
 print("I2E Test Accuracy:", accuracy_score(env_test, W_I2E_pred))
 print("E2L Test Accuracy:", accuracy_score(labels_test, W_E2L_pred))
 print("E2E Test Accuracy:", accuracy_score(env_test, W_E2E_pred))
+

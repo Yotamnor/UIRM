@@ -63,7 +63,6 @@ zero_channel_data = torch.zeros((temp_train_x_e1.shape[0],1,28,28))
 temp_train_x_e1 = torch.cat((temp_train_x_e1.unsqueeze(1), zero_channel_data, zero_channel_data), dim=1)
 temp_train_x_e2 = torch.cat((zero_channel_data, temp_train_x_e2.unsqueeze(1), zero_channel_data), dim=1)
 
-
 temp_dataset_e1 = torch.utils.data.TensorDataset(temp_train_x_e1.float()/255, temp_train_y_e1)
 temp_dataset_e1.data = temp_train_x_e1.unsqueeze(1).float()/255
 temp_dataset_e1.targets = temp_train_y_e1
