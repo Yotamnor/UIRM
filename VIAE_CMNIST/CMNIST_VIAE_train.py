@@ -8,9 +8,7 @@ import torchvision
 
 from CMNIST_VIAE_model import train_beta_vae, Vae_Irm, VaeEncoderEnv1, VaeEncoderEnv2, VaeEncoderCausal, VaeDecoder
 
-
 datapath = '/files/'
-resultsPath = 'C:/Users/Yotam/.spyder-py3/MINST_test/results/'
 
 n_epochs = 50
 batch_size_train = 128#64
